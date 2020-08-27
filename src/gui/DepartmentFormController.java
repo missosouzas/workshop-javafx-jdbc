@@ -1,19 +1,28 @@
 package gui;
 
+import java.awt.IllegalComponentStateException;
 import java.net.URL;
 import java.util.ResourceBundle;
 
+import db.DbException;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import model.entities.Department;
+import model.services.DepartmentService;
+import util.Alerts;
 import util.Constraints;
+import util.Utils;
 
 public class DepartmentFormController implements Initializable {
 	
 	private Department entity;
+	
+	private DepartmentService service;
 	
 
 	@FXML
@@ -35,15 +44,44 @@ public class DepartmentFormController implements Initializable {
 		this.entity = entity;
 	}
 	
+	
+	public void setDepartmentService(DepartmentService service) {
+		this.service = service;
+	}
 	@FXML
-	public void onBtSaveAction(){
-		System.out.println("onBtSaveAction");
+	public void onBtSaveAction(ActionEvent event){
+		if (entity == null)
+		{
+			throw new IllegalComponentStateException("Entidade Nula");
+		}
+		if (service == null)
+		{
+			throw new IllegalComponentStateException("Service é Nulo");
+		}
+
+		try {
+		//salvar no BD
+		entity = getFormData();
+		service.saveOrUpdate(entity);
+		Utils.currentStage(event).close();
+		}
+		catch(DbException e) {
+			Alerts.showAlert("erro ao salvar", null, e.getMessage(), AlertType.ERROR);
+		}
 		
 	}
 	
+	private Department getFormData() {
+		Department obj = new Department();
+		obj.setId(Utils.tryParseToInt(txtId.getText()));
+		obj.setName(txtName.getText());
+		return obj;
+	}
+
+
 	@FXML
-	public void onBtCancelAction(){
-		System.out.println("onBtCancelAction");
+	public void onBtCancelAction(ActionEvent event){
+	  Utils.currentStage(event).close();
 		
 	}
 	
