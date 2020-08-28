@@ -10,6 +10,9 @@ import java.util.Set;
 
 import db.DbException;
 import gui.listerners.DataChangeListener;
+import gui.util.Alerts;
+import gui.util.Constraints;
+import gui.util.Utils;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -20,9 +23,6 @@ import javafx.scene.control.TextField;
 import model.entities.Department;
 import model.exceptions.ValidationException;
 import model.services.DepartmentService;
-import util.Alerts;
-import util.Constraints;
-import util.Utils;
 
 public class DepartmentFormController implements Initializable {
 	
