@@ -2,9 +2,12 @@ package gui;
 
 import java.awt.IllegalComponentStateException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.ResourceBundle;
 
 import db.DbException;
+import gui.listerners.DataChangeListener;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -24,6 +27,8 @@ public class DepartmentFormController implements Initializable {
 	
 	private DepartmentService service;
 	
+	private List<DataChangeListener> dataChangeListeners = new ArrayList<>();
+	
 
 	@FXML
 	private TextField txtId;
@@ -40,6 +45,7 @@ public class DepartmentFormController implements Initializable {
 	@FXML
 	private Button  btCancel;
 	
+		
 	public void setDepartment(Department entity) {
 		this.entity = entity;
 	}
@@ -48,6 +54,11 @@ public class DepartmentFormController implements Initializable {
 	public void setDepartmentService(DepartmentService service) {
 		this.service = service;
 	}
+	
+	public void subscribeDataChangeListener(DataChangeListener listener) {
+		dataChangeListeners.add(listener);
+	}
+	
 	@FXML
 	public void onBtSaveAction(ActionEvent event){
 		if (entity == null)
@@ -63,6 +74,7 @@ public class DepartmentFormController implements Initializable {
 		//salvar no BD
 		entity = getFormData();
 		service.saveOrUpdate(entity);
+		notifyDataChangeListeners();
 		Utils.currentStage(event).close();
 		}
 		catch(DbException e) {
@@ -71,6 +83,15 @@ public class DepartmentFormController implements Initializable {
 		
 	}
 	
+	private void notifyDataChangeListeners() {
+		
+		for (DataChangeListener listener: dataChangeListeners) {
+			listener.onDataChanged();
+		}
+		
+	}
+
+
 	private Department getFormData() {
 		Department obj = new Department();
 		obj.setId(Utils.tryParseToInt(txtId.getText()));
